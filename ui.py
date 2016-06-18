@@ -1,13 +1,14 @@
 import tkinter as tk
 
+import managercore as mc
+
 
 class ui(tk.Frame):
-    def __init__(self, master=None, startfunc=None, testfunc=None):
+    def __init__(self, master=None):
         tk.Frame.__init__(self, master)
         self.grid()
         self.ui()
-        self.startfunc = startfunc
-        self.testfunc = testfunc
+
 
     def ui(self):
         self.Usertext = tk.Label(self)
@@ -65,7 +66,12 @@ class ui(tk.Frame):
         self.Msg.grid(row=2, column=0, columnspan=6)
 
     def start(self):
-        self.startfunc
+        if (mc.core.start()):
+            return True
+        return False
 
     def test(self):
-        self.testfunc
+        if mc.core.test():
+            self.Msg['text'] = 'Connect successed!'
+            return True
+        return False
