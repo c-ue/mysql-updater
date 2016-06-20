@@ -28,7 +28,7 @@ class ui(tk.Frame):
         self.PasswdInput.grid(row=0, column=3)
 
         self.Test = tk.Button(self)
-        self.Test['text'] = "stop"
+        self.Test['text'] = "test"
         self.Test.grid(row=0, column=4)
         self.Test['command'] = self.test
 
@@ -41,9 +41,9 @@ class ui(tk.Frame):
         self.UnitTime['text'] = "Per Cycle time(min)"
         self.UnitTime.grid(row=1, column=0)
 
-        self.Input = tk.Entry(self)
-        self.Input['width'] = 10
-        self.Input.grid(row=1, column=1)
+        self.UnitTimeInput = tk.Entry(self)
+        self.UnitTimeInput['width'] = 10
+        self.UnitTimeInput.grid(row=1, column=1)
 
         self.LoopTimes = tk.Label(self)
         self.LoopTimes['text'] = "Loop Times"
@@ -71,7 +71,11 @@ class ui(tk.Frame):
         return False
 
     def test(self):
-        if mc.core.test():
+        connectobj=mc.core(Loops=self.LoopInput.get(), PerCycleTime=self.UnitTimeInput.get(), StartTime=self.StartInput.get(), User=self.UserInput.get(), Passwd=self.PasswdInput.get())
+        if connectobj.error is not None:
+            self.Msg['text'] = connectobj.error
+            return False
+        if connectobj.test():
             self.Msg['text'] = 'Connect successed!'
             return True
         return False
