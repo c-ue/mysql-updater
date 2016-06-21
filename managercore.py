@@ -1,8 +1,10 @@
-import mysqlcore as mc
 import time
+
+import mysqlcore as mc
+
+
 class core:
     def __init__(self, Loops=None, PerCycleTime=None, StartTime=None, User=None, Passwd=None):
-        self.team = range(1, 8)
         if (Loops.isdigit() and PerCycleTime.isdigit() and StartTime and len(StartTime.split(':')) == 2 and
                 StartTime.split(':')[0].isdigit() and StartTime.split(':')[1].isdigit() and
                         0 <= int(StartTime.split(':')[0]) < 24 and 0 <= int(StartTime.split(':')[1]) < 59 and
@@ -21,7 +23,7 @@ class core:
         return
 
     def start(self):
-        while(time.strftime('%H:%M') != str(self.StartHour) + ':' + str(self.StartMin)):
+        while (int(time.strftime("%H")) * 60 + int(time.strftime("%M")) < self.StartMin + self.StartHour * 60):
             time.sleep(5)
         while(self.loops != 0):
             self.loops-=1
@@ -31,17 +33,20 @@ class core:
     def process(self):
         QidList=self.mysql.GetQidList()
         if QidList==False:
+            self.error = self.mysql.error
             return False
         for i in QidList:
-            TeamList=self.mysql.GetTeamByQid(i[0],i[1])
-            QidScore=self.mysql.GetScoreByQid(i[0],i[1])
+            TeamList = self.mysql.GetTeamByQid(i['uq'], i['lq'])
+            QidScore = self.mysql.GetScoreByQid(i['uq'], i['lq'])
             if TeamList == False or QidList==False:
                 return False
-            PartOfScore=QidScore/len(TeamList)
+            elif TeamList == None:
+                continue
+            PartOfScore = QidScore[0]['score'] / len(TeamList)
             for j in TeamList:
-                if not self.mysql.AddRoundScore(j, PartOfScore):
+                if not self.mysql.AddRoundScore(j['tid'], PartOfScore):
                     return False
-                if not self.mysql.CalcTotalScore(j):
+                if not self.mysql.CalcTotalScore(j['tid']):
                     return False
         return True
 
